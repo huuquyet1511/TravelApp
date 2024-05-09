@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from ckeditor.fields import RichTextField
+from cloudinary.models import CloudinaryField
 
 # Create your models here.
 
@@ -14,7 +15,7 @@ class User(AbstractUser):
     # role = models.CharField(max_length=20)
 
     pass
-    avatar = models.ImageField(upload_to="image/avatar")
+    avatar = CloudinaryField('avatar', null=True)
 
 
 class BaseModel(models.Model):
@@ -42,10 +43,9 @@ class Tag(BaseModel): #địa điểm tour
 
 class Tour(BaseModel):
     tour_name = models.CharField(max_length=100)
-    description = models.TextField()
-    price_adult = models.DecimalField(max_digits=10, decimal_places=2)
-    price_child = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to="image/tours")
+    description = models.TextField(null=True)
+
+    image = models.ImageField(upload_to="image/tours", null=True)
     remaining_quantity = models.IntegerField()  # số lượng vé còn lại
     departure_date = models.DateField()  # ngày khởi hành
     duration = models.CharField(max_length=50)  # thời gian kéo dài của tour
@@ -53,11 +53,20 @@ class Tour(BaseModel):
     category = models.ForeignKey(Category, on_delete=models.RESTRICT)
     tags = models.ManyToManyField(Tag)
 
-    class Meta:
+    class Meta: #không trùng
         unique_together = ('tour_name', 'category')
 
     def __str__(self):
         return self.tour_name
+
+
+class Ticket(BaseModel):
+    title = models.CharField(max_length=200)
+    description = RichTextField(null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    image = models.ImageField(upload_to="image/ticket", null=True)
+
+    tour = models.ForeignKey(Tour, on_delete=models.CASCADE)
 
 
 class Booking(BaseModel): #ticket
@@ -66,11 +75,12 @@ class Booking(BaseModel): #ticket
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    tour = models.ForeignKey(Tour, on_delete=models.CASCADE)
+    # tour = models.ForeignKey(Tour, on_delete=models.CASCADE)
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, null=True)
 
 
 class Rating(BaseModel):
-    rating = models.IntegerField()
+    rating = models.SmallIntegerField(default=0)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE)
@@ -78,7 +88,8 @@ class Rating(BaseModel):
 
 class News(BaseModel):
     title = models.CharField(max_length=200)
-    content = models.TextField(null=True)
+    content = RichTextField(null=True)
+    image = models.ImageField(upload_to="image/news", null=True)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -95,6 +106,8 @@ class Comment(BaseModel):
 
 
 class Like(BaseModel):
+    active_like = models.BooleanField(default=True)
+
     news = models.ForeignKey(News, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
