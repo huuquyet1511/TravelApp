@@ -4,7 +4,7 @@ from django.urls import path
 from django.utils.safestring import mark_safe
 from django import forms
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
-from .models import Category, Tour, User, News, Tag, Ticket
+from .models import Category, Tour, User, News, Tag, Ticket, Booking, Rating, Payment, PaymentMethod
 from .dao import count_tour_by_cat
 
 
@@ -93,3 +93,6 @@ admin_site.register(Tour, TourAdmin)
 admin_site.register(Tag)
 admin_site.register(Ticket, TicketAdmin)
 admin_site.register(News, NewsAdmin)
+admin_site.register(Payment)
+admin_site.register(PaymentMethod)
+admin_site.register(Booking)

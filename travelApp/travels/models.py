@@ -48,6 +48,7 @@ class Tour(BaseModel):
     image = models.ImageField(upload_to="image/tours", null=True)
     remaining_quantity = models.IntegerField()  # số lượng vé còn lại
     departure_date = models.DateField()  # ngày khởi hành
+
     duration = models.CharField(max_length=50)  # thời gian kéo dài của tour
 
     category = models.ForeignKey(Category, on_delete=models.RESTRICT)
@@ -64,6 +65,8 @@ class Ticket(BaseModel):
     title = models.CharField(max_length=200)
     description = RichTextField(null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    departure_location = models.CharField(max_length=100, null=True)  # địa điểm khoi hành
     image = models.ImageField(upload_to="image/ticket", null=True)
 
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE)
@@ -106,10 +109,13 @@ class Comment(BaseModel):
 
 
 class Like(BaseModel):
-    active_like = models.BooleanField(default=True)
+    liked = models.BooleanField(default=True)
 
     news = models.ForeignKey(News, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'news') #id 2 field nay khong duoc trung nhau
 
 
 class PaymentMethod(models.Model):
@@ -121,7 +127,7 @@ class PaymentMethod(models.Model):
 
 
 class Payment(BaseModel):
-    payment_status = models.CharField(max_length=20)
+    payment_status = models.BooleanField(default=True)
 
     payment_method = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE)
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)

@@ -1,4 +1,4 @@
-from .models import Category, Tour, News, Ticket, Tag, User
+from .models import Category, Tour, News, Ticket, Tag, User, Comment, Rating
 from rest_framework import serializers
 
 
@@ -18,7 +18,7 @@ class TourSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(source='image')
     tags = TagSerializer(many=True)
 
-    def get_image(self, obj):
+    def get_image(self, obj): #lấy hình them /static/ vao duong dan
         request = self.context.get('request')
         if obj.image:
             if request:
@@ -34,7 +34,19 @@ class TourSerializer(serializers.ModelSerializer):
 class NewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
-        fields = '__all__'
+        fields = ['id', 'title', 'content', 'created_date', 'updated_date', 'image']
+
+
+class NewsSerializerDetail(NewsSerializer):
+    liked = serializers.SerializerMethodField()
+
+    def get_liked(self, news):
+        request = self.context.get('request')
+        if request.user.is_authenticated:
+            return news.like_set.filter(liked=True, user=request.user).exists()
+    class Meta:
+        model = NewsSerializer.Meta.model
+        fields = NewsSerializer.Meta.fields + ['liked']
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -53,7 +65,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         return user
 
-    class Meta:
+    class Meta: #chỉ tạo không hiện mk
         extra_kwargs = {
             'password': {
                 'write_only': True
@@ -63,3 +75,14 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['first_name', 'last_name', 'email', 'username', 'password']
 
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'content']
+
+
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = ['id', 'rating']
