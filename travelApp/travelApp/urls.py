@@ -43,6 +43,8 @@ router.register('tickets', views.TicketViewSet, basename='tickets')
 router.register('users', views.UserViewSet, basename='users')
 router.register('comments', views.CommentViewSet, basename='comments')
 router.register('rating', views.RatingViewSet, basename='rating')
+router.register('booking', views.BookingViewSet, basename='booking')
+
 
 urlpatterns = [
     path('', include(router.urls)),

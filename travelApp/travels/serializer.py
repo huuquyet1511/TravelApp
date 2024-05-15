@@ -1,4 +1,4 @@
-from .models import Category, Tour, News, Ticket, Tag, User, Comment, Rating
+from .models import Category, Tour, News, Ticket, Tag, User, Comment, Rating, Booking, Payment
 from rest_framework import serializers
 
 
@@ -39,7 +39,14 @@ class NewsSerializer(serializers.ModelSerializer):
 
 class NewsSerializerDetail(NewsSerializer):
     liked = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField(source='image')
 
+    def get_image(self, obj):  # lấy hình them /static/ vao duong dan
+        request = self.context.get('request')
+        if obj.image:
+            if request:
+                return request.build_absolute_uri("/static/%s" % obj.image.name)
+            return "/static/%s" % obj.image.name
     def get_liked(self, news):
         request = self.context.get('request')
         if request.user.is_authenticated:
@@ -50,6 +57,15 @@ class NewsSerializerDetail(NewsSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField(source='image')
+
+    def get_image(self, obj):  # lấy hình them /static/ vao duong dan
+        request = self.context.get('request')
+        if obj.image:
+            if request:
+                return request.build_absolute_uri("/static/%s" % obj.image.name)
+            return "/static/%s" % obj.image.name
+
     class Meta:
         model = Ticket
         fields = '__all__'
@@ -86,3 +102,15 @@ class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = ['id', 'rating']
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        fields = ['adult_quantity', 'child_quantity', 'total_price']
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = '__all__'

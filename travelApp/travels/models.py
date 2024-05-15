@@ -71,15 +71,21 @@ class Ticket(BaseModel):
 
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.title
+
 
 class Booking(BaseModel): #ticket
     adult_quantity = models.IntegerField(default=1)
     child_quantity = models.IntegerField(default=0)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     # tour = models.ForeignKey(Tour, on_delete=models.CASCADE)
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, null=True)
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+
+    # class Meta:
+    #     unique_together = ('user', 'ticket')
 
 
 class Rating(BaseModel):

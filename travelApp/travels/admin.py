@@ -84,6 +84,10 @@ class TicketAdmin(admin.ModelAdmin):
     list_filter = ['price']
 
 
+class BookingAdmin(admin.ModelAdmin):
+    list_display = ['id', 'adult_quantity', 'child_quantity', 'total_price', 'user_id', 'ticket_id']
+
+
 admin_site = TravelAppAdminSite(name="myapp")
 
 
@@ -95,4 +99,4 @@ admin_site.register(Ticket, TicketAdmin)
 admin_site.register(News, NewsAdmin)
 admin_site.register(Payment)
 admin_site.register(PaymentMethod)
-admin_site.register(Booking)
+admin_site.register(Booking, BookingAdmin)
